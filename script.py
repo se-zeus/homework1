@@ -1,10 +1,12 @@
 def __main__(num):
-
+    s = ""
     for i in range(1, num):
-        print("*" * i)
+        s += ("*" * i) + "\n"
 
     for i in range(0, num):
-        print("*" * (num - i))
+        s += ("*" * (num - i)) + "\n"
+
+    return s
 
 
-__main__(5)
+print(__main__(5))

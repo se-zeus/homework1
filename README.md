@@ -3,3 +3,5 @@
 ![License](https://img.shields.io/github/license/se-zeus/homework1.svg)
 
 ![Platform](https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black)
+
+![Pytest workflow](https://github.com/se-zeus/homework1/actions/workflows/pyflow.yaml/badge.svg)

@@ -1,0 +1,57 @@
+hw2_debugging.py
+    F 13:0 recombine - B
+    F 4:0 mergeSort - A
+rand.py
+    F 4:0 random_array - A
+hw2_debugging.py
+    LOC: 39
+    LLOC: 28
+    SLOC: 27
+    Comments: 0
+    Single comments: 0
+    Multi: 0
+    Blank: 12
+    - Comment Stats
+        (C % L): 0%
+        (C % S): 0%
+        (C + M % L): 0%
+rand.py
+    LOC: 11
+    LLOC: 7
+    SLOC: 8
+    Comments: 0
+    Single comments: 0
+    Multi: 0
+    Blank: 3
+    - Comment Stats
+        (C % L): 0%
+        (C % S): 0%
+        (C + M % L): 0%
+hw2_debugging.py - A
+rand.py - A
+hw2_debugging.py:
+    h1: 6
+    h2: 19
+    N1: 17
+    N2: 34
+    vocabulary: 25
+    length: 51
+    calculated_length: 96.22039775975506
+    volume: 236.83666567851094
+    difficulty: 5.368421052631579
+    effort: 1271.438942063585
+    time: 70.63549678131028
+    bugs: 0.07894555522617032
+rand.py:
+    h1: 0
+    h2: 0
+    N1: 0
+    N2: 0
+    vocabulary: 0
+    length: 0
+    calculated_length: 0
+    volume: 0
+    difficulty: 0
+    effort: 0
+    time: 0.0
+    bugs: 0.0

@@ -1,5 +1,4 @@
 from script import __main__
-import pytest
 
 class TestClass:
     def test_fail(self):

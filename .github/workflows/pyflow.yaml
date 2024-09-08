@@ -23,9 +23,5 @@ jobs:
       run: |
         pip install pytest
         pytest
-    - name: Test hw2 with pytest
-      run: |
         pytest ./hw2/
-    - name: Run Autopep8
-      run: |
         autopep8 --in-place --aggressive --aggressive ./hw2/

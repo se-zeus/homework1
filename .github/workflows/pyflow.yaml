@@ -85,6 +85,43 @@ jobs:
           else
             echo "BANDIT_BADGE_COLOR=brightgreen" >> $GITHUB_ENV
           fi
+      - name: Update README with all the badges
+        run: |
+         RUN_LOG_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+         
+         sed -i '/\[!\[badge_pylint\]/c\[!\[badge_pylint\]('"${PYLINT_BADGE_URL}"')]('"${RUN_LOG_URL}"')' README.md
+         sed -i '/\[!\[badge_pyright\]/c\[!\[badge_pyright\]('"${PYRIGHT_BADGE_URL}"')]('"${RUN_LOG_URL}"')' README.md
+         sed -i '/\[!\[badge_total_tests\]/c\[!\[badge_total_tests\]('"${TOTAL_TESTS_BADGE_URL}"')](https://github.com/gitsetgopack/hw2/tree/main/tests)' README.md
+         sed -i '/\[!\[badge_code_coverage\]/c\[!\[badge_code_coverage\]('"${CODE_COVERAGE_BADGE_URL}"')]('"${RUN_LOG_URL}"')' README.md
+         sed -i '/\[!\[badge_pytest_status\]/c\[!\[badge_pytest_status\]('"${PYTEST_STATUS_BADGE_URL}"')]('"${RUN_LOG_URL}"')' README.md
+         
+         rm -rf tmp
+         
+         git config --global user.name "github-actions[bot]"
+         git config --global user.email "github-actions[bot]@users.noreply.github.com"
+         git checkout main
+         git pull
+         
+         if git diff --quiet; then
+             echo "No changes to commit"
+         else
+             git add README.md
+             git commit -m "Update all badges in README"
+             git push
+         fi
+
+      - name: Fail if any tool failed
+        run: |
+         for TOOL in PYRIGHT PYLINT PYTEST; do
+           EXIT_CODE_VAR="${TOOL}_EXIT_CODE"
+           EXIT_CODE="${!EXIT_CODE_VAR}"
+           echo "Checking exit code for $TOOL: $EXIT_CODE"
+           if [ "$EXIT_CODE" -ne 0 ]; then
+             echo "$TOOL failed, marking job as failed."
+             exit 1
+           fi
+         done
+
 
       # - name: Update README with badges
       #   run: |
@@ -108,3 +145,4 @@ jobs:
       #     else
       #       echo "README.md not found!"
       #       exit 1
+      

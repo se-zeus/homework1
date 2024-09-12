@@ -27,20 +27,20 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pytest autopep8
+          pip install pytest autopep8 radon bandit
 
       - name: Run pytest for HW2
         run: pytest ./hw2/
 
       - name: Run AutoPEP8
-        run: autopep8 --in-place --aggressive --aggressive ./hw2/
+        run: autopep8 --in-place --aggressive --aggressive ./hw2/*.py
 
-      - name: Badge for pytest
-        if: always()
+      - name: Run Radon
         run: |
-          pytest --junitxml=pytest-results.xml
+          mkdir -p logs
+          radon cc ./hw2/ > logs/radon_log.txt
 
-      - name: Badge for AutoPEP8
-        if: always()
+      - name: Run Bandit
         run: |
-          autopep8 --diff ./hw2/ > autopep8-diff.txt
+          mkdir -p logs
+          bandit -r ./hw2/ > logs/bandit_log.txt

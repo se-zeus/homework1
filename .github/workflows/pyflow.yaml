@@ -33,14 +33,21 @@ jobs:
         run: pytest ./hw2/
 
       - name: Run AutoPEP8
-        run: autopep8 --in-place --aggressive --aggressive ./hw2/*.py
+        id: autopep8_check 
+        run: |
+          autopep8 --in-place --aggressive --aggressive ./hw2/*.py
+        continue-on-error: false
 
       - name: Run Radon
+        id: radon_check
         run: |
           mkdir -p logs
           radon cc ./hw2/ > logs/radon_log.txt
+        continue-on-error: false
 
       - name: Run Bandit
+        id: bandit_check
         run: |
           mkdir -p logs
           bandit -r ./hw2/ -f txt -o logs/bandit_log.txt || echo "No issues found" > logs/bandit_log.txt
+        continue-on-error: false

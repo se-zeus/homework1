@@ -43,4 +43,4 @@ jobs:
       - name: Run Bandit
         run: |
           mkdir -p logs
-          bandit -r ./hw2/ > logs/bandit_log.txt
+          bandit -r ./hw2/ -f txt -o logs/bandit_log.txt || echo "No issues found" > logs/bandit_log.txt

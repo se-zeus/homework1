@@ -95,10 +95,10 @@ jobs:
 
           # Ensure README.md exists in the root directory
           if [ -f README.md ]; then
-            sed -i "s|\[!\[Pytest\](.*)|\[!\[Pytest\](${PYTEST_BADGE_URL})](https://github.com/Anjan50/homework1/actions/workflows/pyflow.yaml)|" README.md
-            sed -i "s|\[!\[AutoPEP8\](.*)|\[!\[AutoPEP8\](${AUTOPEP8_BADGE_URL})](https://github.com/Anjan50/homework1/actions/workflows/pyflow.yaml)|" README.md
-            sed -i "s|\[!\[Radon\](.*)|\[!\[Radon\](${RADON_BADGE_URL})](https://github.com/Anjan50/homework1/actions/workflows/pyflow.yaml)|" README.md
-            sed -i "s|\[!\[Bandit\](.*)|\[!\[Bandit\](${BANDIT_BADGE_URL})](https://github.com/Anjan50/homework1/actions/workflows/pyflow.yaml)|" README.md
+            sed -i "s|\[!\[Pytest\](.*)|\[!\[Pytest\](${PYTEST_BADGE_URL})](https://github.com/YOUR_GITHUB_USERNAME/homework1/actions/workflows/pyflow.yaml)|" README.md
+            sed -i "s|\[!\[AutoPEP8\](.*)|\[!\[AutoPEP8\](${AUTOPEP8_BADGE_URL})](https://github.com/YOUR_GITHUB_USERNAME/homework1/actions/workflows/pyflow.yaml)|" README.md
+            sed -i "s|\[!\[Radon\](.*)|\[!\[Radon\](${RADON_BADGE_URL})](https://github.com/YOUR_GITHUB_USERNAME/homework1/actions/workflows/pyflow.yaml)|" README.md
+            sed -i "s|\[!\[Bandit\](.*)|\[!\[Bandit\](${BANDIT_BADGE_URL})](https://github.com/YOUR_GITHUB_USERNAME/homework1/actions/workflows/pyflow.yaml)|" README.md
 
             git config --global user.name "github-actions[bot]"
             git config --global user.email "github-actions[bot]@users.noreply.github.com"
@@ -108,3 +108,5 @@ jobs:
           else
             echo "README.md not found!"
             exit 1
+          fi
+        done

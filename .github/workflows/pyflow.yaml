@@ -32,29 +32,70 @@ jobs:
       - name: Run pytest for HW2
         id: pytest_check
         run: pytest ./hw2/
+        continue-on-error: true
+      - name: Capture pytest result
+        run: |
+          if [ $? -eq 0 ]; then
+            echo "PYTEST_BADGE_COLOR=brightgreen" >> $GITHUB_ENV
+          else
+            echo "PYTEST_BADGE_COLOR=red" >> $GITHUB_ENV
+          fi
 
       - name: Run AutoPEP8
         id: autopep8_check
         run: |
           autopep8 --in-place --aggressive --aggressive ./hw2/*.py
-        continue-on-error: false
+        continue-on-error: true
+      - name: Capture AutoPEP8 result
+        run: |
+          if [ $? -eq 0 ]; then
+            echo "AUTOPEP8_BADGE_COLOR=brightgreen" >> $GITHUB_ENV
+          else
+            echo "AUTOPEP8_BADGE_COLOR=red" >> $GITHUB_ENV
+          fi
 
       - name: Run Radon
         id: radon_check
         run: |
           mkdir -p logs
           radon cc ./hw2/ > logs/radon_log.txt
-        continue-on-error: false
+        continue-on-error: true
+      - name: Capture Radon result
+        run: |
+          if grep "ERROR" logs/radon_log.txt; then
+            echo "RADON_BADGE_COLOR=red" >> $GITHUB_ENV
+          else
+            echo "RADON_BADGE_COLOR=brightgreen" >> $GITHUB_ENV
+          fi
 
       - name: Run Bandit
         id: bandit_check
         run: |
           mkdir -p logs
           bandit -r ./hw2/ -f txt -o logs/bandit_log.txt || echo "No issues found" > logs/bandit_log.txt
-        continue-on-error: false
+        continue-on-error: true
+      - name: Capture Bandit result
+        run: |
+          if grep "ERROR" logs/bandit_log.txt; then
+            echo "BANDIT_BADGE_COLOR=red" >> $GITHUB_ENV
+          else
+            echo "BANDIT_BADGE_COLOR=brightgreen" >> $GITHUB_ENV
+          fi
 
-  outputs:  # This section will define outputs for each step
-    pytest_result: ${{ steps.pytest_check.outcome }}
-    autopep8_result: ${{ steps.autopep8_check.outcome }}
-    radon_result: ${{ steps.radon_check.outcome }}
-    bandit_result: ${{ steps.bandit_check.outcome }}
+      - name: Update README with badges
+        run: |
+          PYTEST_BADGE_URL="https://img.shields.io/badge/Pytest-${{ env.PYTEST_BADGE_COLOR }}"
+          AUTOPEP8_BADGE_URL="https://img.shields.io/badge/AutoPEP8-${{ env.AUTOPEP8_BADGE_COLOR }}"
+          RADON_BADGE_URL="https://img.shields.io/badge/Radon-${{ env.RADON_BADGE_COLOR }}"
+          BANDIT_BADGE_URL="https://img.shields.io/badge/Bandit-${{ env.BANDIT_BADGE_COLOR }}"
+
+          sed -i '/\[!\[Pytest\]/c\[!\[Pytest\]('"$PYTEST_BADGE_URL"')]('"https://github.com/Anjan50/homework1/actions/workflows/pyflow.yaml"')' README.md
+          sed -i '/\[!\[AutoPEP8\]/c\[!\[AutoPEP8\]('"$AUTOPEP8_BADGE_URL"')]('"https://github.com/Anjan50/homework1/actions/workflows/pyflow.yaml"')' README.md
+          sed -i '/\[!\[Radon\]/c\[!\[Radon\]('"$RADON_BADGE_URL"')]('"https://github.com/Anjan50/homework1/actions/workflows/pyflow.yaml"')' README.md
+          sed -i '/\[!\[Bandit\]/c\[!\[Bandit\]('"$BANDIT_BADGE_URL"')]('"https://github.com/Anjan50/homework1/actions/workflows/pyflow.yaml"')'
+
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add README.md
+          git commit -m "Update badges in README"
+          git push

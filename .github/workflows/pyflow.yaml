@@ -89,13 +89,19 @@ jobs:
           RADON_BADGE_URL="https://img.shields.io/badge/Radon-${{ env.RADON_BADGE_COLOR }}"
           BANDIT_BADGE_URL="https://img.shields.io/badge/Bandit-${{ env.BANDIT_BADGE_COLOR }}"
 
-          sed -i '/\[!\[Pytest\]/c\[!\[Pytest\]('"$PYTEST_BADGE_URL"')]('"https://github.com/Anjan50/homework1/actions/workflows/pyflow.yaml"')' README.md
-          sed -i '/\[!\[AutoPEP8\]/c\[!\[AutoPEP8\]('"$AUTOPEP8_BADGE_URL"')]('"https://github.com/Anjan50/homework1/actions/workflows/pyflow.yaml"')' README.md
-          sed -i '/\[!\[Radon\]/c\[!\[Radon\]('"$RADON_BADGE_URL"')]('"https://github.com/Anjan50/homework1/actions/workflows/pyflow.yaml"')' README.md
-          sed -i '/\[!\[Bandit\]/c\[!\[Bandit\]('"$BANDIT_BADGE_URL"')]('"https://github.com/Anjan50/homework1/actions/workflows/pyflow.yaml"')'
+          # Ensure README.md exists in the root directory
+          if [ -f README.md ]; then
+            sed -i '/\[!\[Pytest\]/c\[!\[Pytest\]('"$PYTEST_BADGE_URL"')]('"https://github.com/Anjan50/homework1/actions/workflows/pyflow.yaml"')' README.md
+            sed -i '/\[!\[AutoPEP8\]/c\[!\[AutoPEP8\]('"$AUTOPEP8_BADGE_URL"')]('"https://github.com/Anjan50/homework1/actions/workflows/pyflow.yaml"')' README.md
+            sed -i '/\[!\[Radon\]/c\[!\[Radon\]('"$RADON_BADGE_URL"')]('"https://github.com/Anjan50/homework1/actions/workflows/pyflow.yaml"')' README.md
+            sed -i '/\[!\[Bandit\]/c\[!\[Bandit\]('"$BANDIT_BADGE_URL"')]('"https://github.com/Anjan50/homework1/actions/workflows/pyflow.yaml"')'
 
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add README.md
-          git commit -m "Update badges in README"
-          git push
+            git config --global user.name "github-actions[bot]"
+            git config --global user.email "github-actions[bot]@users.noreply.github.com"
+            git add README.md
+            git commit -m "Update badges in README"
+            git push
+          else
+            echo "README.md not found!"
+            exit 1
+          fi

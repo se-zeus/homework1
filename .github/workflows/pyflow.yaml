@@ -85,26 +85,46 @@ jobs:
           else
             echo "BANDIT_BADGE_COLOR=brightgreen" >> $GITHUB_ENV
           fi
+      - name: Update README with all the badges
+        run: |
+         RUN_LOG_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+         
+         # Update badges in README.md
+         sed -i '/\[!\[badge_pylint\]/c\[!\[badge_pylint\]('"${PYLINT_BADGE_URL}"')]('"${RUN_LOG_URL}"')' README.md
+         sed -i '/\[!\[badge_pyright\]/c\[!\[badge_pyright\]('"${PYRIGHT_BADGE_URL}"')]('"${RUN_LOG_URL}"')' README.md
+         sed -i '/\[!\[badge_total_tests\]/c\[!\[badge_total_tests\]('"${TOTAL_TESTS_BADGE_URL}"')](https://github.com/gitsetgopack/hw2/tree/main/tests)' README.md
+         sed -i '/\[!\[badge_code_coverage\]/c\[!\[badge_code_coverage\]('"${CODE_COVERAGE_BADGE_URL}"')]('"${RUN_LOG_URL}"')' README.md
+         sed -i '/\[!\[badge_pytest_status\]/c\[!\[badge_pytest_status\]('"${PYTEST_STATUS_BADGE_URL}"')]('"${RUN_LOG_URL}"')' README.md
+         
+         # Remove tmp directory if exists
+         rm -rf tmp
+         
+         # Configure git
+         git config --global user.name "github-actions[bot]"
+         git config --global user.email "github-actions[bot]@users.noreply.github.com"
+         
+         # Checkout the correct branch (main in your case)
+         git checkout main
+         
+         # Pull the latest changes
+         git pull
+         
+         # Stage all modified files for commit
+         git add hw2/hw2_debugging.py hw2/rand.py hw2/test_merge.py README.md
+ 
+         # Handle untracked files and update .gitignore
+         echo "hw2/__pycache__/" >> .gitignore
+         echo "logs/" >> .gitignore
+         
+         # Add .gitignore to the staged files
+         git add .gitignore
+         
+         # Check for changes and commit
+         if git diff --staged --quiet; then
+             echo "No changes to commit"
+         else
+             git commit -m "Update all badges in README and commit changes"
+             git push
+         fi
 
-      # - name: Update README with badges
-      #   run: |
-      #     PYTEST_BADGE_URL="https://img.shields.io/badge/Pytest-${{ env.PYTEST_BADGE_COLOR }}-brightgreen"
-      #     AUTOPEP8_BADGE_URL="https://img.shields.io/badge/AutoPEP8-${{ env.AUTOPEP8_BADGE_COLOR }}-brightgreen"
-      #     RADON_BADGE_URL="https://img.shields.io/badge/Radon-${{ env.RADON_BADGE_COLOR }}-brightgreen"
-      #     BANDIT_BADGE_URL="https://img.shields.io/badge/Bandit-${{ env.BANDIT_BADGE_COLOR }}-brightgreen"
-
-      #     # Ensure README.md exists in the root directory
-      #     if [ -f README.md ]; then
-      #       sed -i "s|\\[!\\[Pytest\\](.*)|\\[!\\[Pytest\\](${PYTEST_BADGE_URL})](https://github.com/YOUR_GITHUB_USERNAME/homework1/actions/workflows/pyflow.yaml)|" README.md
-      #       sed -i "s|\\[!\\[AutoPEP8\\](.*)|\\[!\\[AutoPEP8\\](${AUTOPEP8_BADGE_URL})](https://github.com/YOUR_GITHUB_USERNAME/homework1/actions/workflows/pyflow.yaml)|" README.md
-      #       sed -i "s|\\[!\\[Radon\\](.*)|\\[!\\[Radon\\](${RADON_BADGE_URL})](https://github.com/YOUR_GITHUB_USERNAME/homework1/actions/workflows/pyflow.yaml)|" README.md
-      #       sed -i "s|\\[!\\[Bandit\\](.*)|\\[!\\[Bandit\\](${BANDIT_BADGE_URL})](https://github.com/YOUR_GITHUB_USERNAME/homework1/actions/workflows/pyflow.yaml)|" README.md
-
-      #       git config --global user.name "github-actions[bot]"
-      #       git config --global user.email "github-actions[bot]@users.noreply.github.com"
-      #       git add README.md
-      #       git commit -m "Update badges in README"
-      #       git push
-      #     else
-      #       echo "README.md not found!"
-      #       exit 1
+      

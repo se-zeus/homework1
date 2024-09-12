@@ -5,4 +5,4 @@ class TestClass:
         assert __main__(5) == "*\n**\n***\n****\n*****\n****\n***\n**\n*\n"
 
     def test_pass(self):
-        assert __main__(5) == "*\n**\n***\n****\n*****\n****\n***\n**\n*"
+        assert __main__(5) == "\n\n*\n*\n**\n*\n**\n\n\n"

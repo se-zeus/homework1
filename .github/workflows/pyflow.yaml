@@ -46,9 +46,9 @@ jobs:
       run: bandit -r hw2_debugging.py rand.py >> /logs/bandit_log
     
     - name: Commit log files
-        run: |
-          git config --global user.name 'm11dedhia'
-          git config --global user.email 'm11dedhia@users.noreply.github.com'
-          git add .
-          git commit -am "Automated log file commit"
-          git push
+      run: |
+        git config --global user.name 'm11dedhia'
+        git config --global user.email 'm11dedhia@users.noreply.github.com'
+        git add .
+        git commit -am "Automated log file commit"
+        git push

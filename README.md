@@ -8,7 +8,7 @@
 
 [![Pytest](https://github.com/Anjan50/homework1/actions/workflows/pyflow.yaml/badge.svg?event=push&name=pytest_check)](https://github.com/Anjan50/homework1/actions/workflows/pyflow.yaml)
 [![AutoPEP8](https://github.com/Anjan50/homework1/actions/workflows/pyflow.yaml/badge.svg?event=push&name=autopep8_check)](https://github.com/Anjan50/homework1/actions/workflows/pyflow.yaml)
-[![Radon](https://github.com/Anjan50/homework1/actions/workflows/pyflow.yaml/badge.svg?event=push&name=radon_check)](https://github.com/Anjan50/homework1/actions/workflows/pyflow.yaml)
+[![radon](https://img.shields.io/badge/Radon-yellow)](https://github.com/se-zeus/homework1/actions)
 [![Bandit](https://github.com/Anjan50/homework1/actions/workflows/pyflow.yaml/badge.svg?event=push&name=bandit_check)](https://github.com/Anjan50/homework1/actions/workflows/pyflow.yaml)
 
 

@@ -11,115 +11,153 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     strategy:
       matrix:
-        python-version: ["3.13"]
+        python-version: ["3.12"]
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+    - name: Checkout repository
+      uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.x'
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install pytest autopep8 radon bandit
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pytest autopep8 pylint radon bandit
 
-      - name: Run pytest for HW2
-        id: pytest_check
-        run: pytest ./hw2/
-        continue-on-error: true
+    # Run pytest for unit testing
+    - name: Run Pytest for HW2
+      id: pytest_check
+      run: |
+        mkdir -p logs
+        pytest --maxfail=1 --disable-warnings --junitxml=logs/pytest-report.xml
+      continue-on-error: true
 
-      - name: Capture pytest result
-        run: |
-          if [ $? -eq 0 ]; then
-            echo "PYTEST_BADGE_COLOR=brightgreen" >> $GITHUB_ENV
-          else
-            echo "PYTEST_BADGE_COLOR=red" >> $GITHUB_ENV
+    - name: Capture Pytest result
+      run: |
+        if [ $? -eq 0 ]; then
+          echo "PYTEST_BADGE_COLOR=brightgreen" >> $GITHUB_ENV
+        else
+          echo "PYTEST_BADGE_COLOR=red" >> $GITHUB_ENV
+        fi
+
+    # Run autopep8 for code formatting
+    - name: Run AutoPEP8
+      id: autopep8_check
+      run: |
+        autopep8 --in-place --aggressive --aggressive ./hw2/*.py
+      continue-on-error: true
+
+    - name: Capture AutoPEP8 result
+      run: |
+        if [ $? -eq 0 ]; then
+          echo "AUTOPEP8_BADGE_COLOR=brightgreen" >> $GITHUB_ENV
+        else
+          echo "AUTOPEP8_BADGE_COLOR=red" >> $GITHUB_ENV
+        fi
+
+    # Run pylint for code linting
+    - name: Run Pylint
+      id: pylint_check
+      run: |
+        mkdir -p logs
+        pylint hw2/*.py > logs/pylint_log.txt || true
+      continue-on-error: true
+
+    - name: Capture Pylint result
+      run: |
+        if grep -q "rated at" logs/pylint_log.txt; then
+          echo "PYLINT_BADGE_COLOR=brightgreen" >> $GITHUB_ENV
+        else
+          echo "PYLINT_BADGE_COLOR=red" >> $GITHUB_ENV
+        fi
+
+    # Run Radon for cyclomatic complexity
+    - name: Run Radon
+      id: radon_check
+      run: |
+        mkdir -p logs
+        radon cc ./hw2/ > logs/radon_log.txt
+      continue-on-error: true
+
+    - name: Capture Radon result
+      run: |
+        if grep "F" logs/radon_log.txt; then
+          echo "RADON_BADGE_COLOR=red" >> $GITHUB_ENV
+        else
+          echo "RADON_BADGE_COLOR=brightgreen" >> $GITHUB_ENV
+        fi
+
+    # Run Bandit for security analysis
+    - name: Run Bandit
+      id: bandit_check
+      run: |
+        mkdir -p logs
+        bandit -r ./hw2/ -f txt -o logs/bandit_log.txt || echo "No issues found" >> logs/bandit_log.txt
+      continue-on-error: true
+
+    - name: Capture Bandit result
+      run: |
+        if grep "No issues found" logs/bandit_log.txt; then
+          echo "BANDIT_BADGE_COLOR=brightgreen" >> $GITHUB_ENV
+        else
+          echo "BANDIT_BADGE_COLOR=red" >> $GITHUB_ENV
+        fi
+
+    # Display logs (optional for debugging purposes)
+    - name: Display Bandit log
+      run: cat logs/bandit_log.txt
+
+    - name: Display Pytest log
+      run: cat logs/pytest-report.xml
+
+    - name: Display Pylint log
+      run: cat logs/pylint_log.txt
+
+    # Update README with badges
+    - name: Update README with badges
+      run: |
+        RUN_LOG_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+        PYLINT_BADGE_URL="https://img.shields.io/badge/Pylint-${{ env.PYLINT_BADGE_COLOR }}.svg"
+        PYTEST_BADGE_URL="https://img.shields.io/badge/Pytest-${{ env.PYTEST_BADGE_COLOR }}.svg"
+        AUTOPEP8_BADGE_URL="https://img.shields.io/badge/AutoPEP8-${{ env.AUTOPEP8_BADGE_COLOR }}.svg"
+        RADON_BADGE_URL="https://img.shields.io/badge/Radon-${{ env.RADON_BADGE_COLOR }}.svg"
+        BANDIT_BADGE_URL="https://img.shields.io/badge/Bandit-${{ env.BANDIT_BADGE_COLOR }}.svg"
+        
+        sed -i '/\[!\[badge_pylint\]/c\[!\[badge_pylint\]('"${PYLINT_BADGE_URL}"')]('"${RUN_LOG_URL}"')' README.md
+        sed -i '/\[!\[badge_pytest\]/c\[!\[badge_pytest\]('"${PYTEST_BADGE_URL}"')]('"${RUN_LOG_URL}"')' README.md
+        sed -i '/\[!\[badge_autopep8\]/c\[!\[badge_autopep8\]('"${AUTOPEP8_BADGE_URL}"')]('"${RUN_LOG_URL}"')' README.md
+        sed -i '/\[!\[badge_radon\]/c\[!\[badge_radon\]('"${RADON_BADGE_URL}"')]('"${RUN_LOG_URL}"')' README.md
+        sed -i '/\[!\[badge_bandit\]/c\[!\[badge_bandit\]('"${BANDIT_BADGE_URL}"')]('"${RUN_LOG_URL}"')' README.md
+
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        
+        git checkout main
+        git pull
+        
+        if git diff --quiet; then
+          echo "No changes to commit"
+        else
+          git add README.md
+          git commit -m "Update README badges"
+          git push
+        fi
+
+    # Fail the build if any tool failed
+    - name: Fail if any tool failed
+      run: |
+        for TOOL in PYRIGHT PYLINT PYTEST BANDIT RADON; do
+          EXIT_CODE_VAR="${TOOL}_EXIT_CODE"
+          EXIT_CODE="${!EXIT_CODE_VAR}"
+          echo "Checking exit code for $TOOL: $EXIT_CODE"
+          if [ "$EXIT_CODE" -ne 0 ]; then
+            echo "$TOOL failed, marking job as failed."
+            exit 1
           fi
-
-      - name: Run AutoPEP8
-        id: autopep8_check
-        run: |
-          autopep8 --in-place --aggressive --aggressive ./hw2/*.py
-        continue-on-error: true
-
-      - name: Capture AutoPEP8 result
-        run: |
-          if [ $? -eq 0 ]; then
-            echo "AUTOPEP8_BADGE_COLOR=brightgreen" >> $GITHUB_ENV
-          else
-            echo "AUTOPEP8_BADGE_COLOR=red" >> $GITHUB_ENV
-          fi
-
-      - name: Run Radon
-        id: radon_check
-        run: |
-          mkdir -p logs
-          radon cc ./hw2/ > logs/radon_log.txt
-        continue-on-error: true
-
-      - name: Capture Radon result
-        run: |
-          if grep "ERROR" logs/radon_log.txt; then
-            echo "RADON_BADGE_COLOR=red" >> $GITHUB_ENV
-          else
-            echo "RADON_BADGE_COLOR=brightgreen" >> $GITHUB_ENV
-          fi
-
-      - name: Run Bandit 
-        id: bandit_check 
-        run: |
-          mkdir -p logs
-          bandit -r ./hw2/ -f txt -o logs/bandit_log.txt || echo "No issues found" > logs/bandit_log.txt
-        continue-on-error: true
-
-      - name: Capture Bandit result
-        run: |
-          if grep "ERROR" logs/bandit_log.txt; then
-            echo "BANDIT_BADGE_COLOR=red" >> $GITHUB_ENV
-          else
-            echo "BANDIT_BADGE_COLOR=brightgreen" >> $GITHUB_ENV
-          fi
-
-      - name: Update README with all the badges
-        run: |
-          RUN_LOG_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          sed -i '/\[!\[badge_pylint\]/c\[!\[badge_pylint\]('"$PYLINT_BADGE_URL"')]('"$RUN_LOG_URL"')' README.md
-          sed -i '/\[!\[badge_pyright\]/c\[!\[badge_pyright\]('"$PYRIGHT_BADGE_URL"')]('"$RUN_LOG_URL"')' README.md
-          sed -i '/\[!\[badge_total_tests\]/c\[!\[badge_total_tests\]('"$TOTAL_TESTS_BADGE_URL"')](https://github.com/gitsetgopack/hw2/tree/main/tests)' README.md
-          sed -i '/\[!\[badge_code_coverage\]/c\[!\[badge_code_coverage\]('"$CODE_COVERAGE_BADGE_URL"')]('"$RUN_LOG_URL"')' README.md
-          sed -i '/\[!\[badge_pytest_status\]/c\[!\[badge_pytest_status\]('"$PYTEST_STATUS_BADGE_URL"')]('"$RUN_LOG_URL"')' README.md
-
-          rm -rf tmp
-
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git checkout main
-          git pull
-
-          if git diff --quiet; then
-              echo "No changes to commit"
-          else
-              git add README.md
-              git commit -m "Update all badges in README"
-              git push
-          fi
-
-      - name: Fail if any tool failed
-        run: |
-          for TOOL in PYRIGHT PYLINT PYTEST; do
-            EXIT_CODE_VAR="${TOOL}_EXIT_CODE"
-            EXIT_CODE="${!EXIT_CODE_VAR}"
-
-            echo "Checking exit code for $TOOL: $EXIT_CODE"
-
-            if [ "$EXIT_CODE" -ne 0 ]; then
-              echo "$TOOL failed, marking job as failed."
-              exit 1
-            fi
-          done
+        done

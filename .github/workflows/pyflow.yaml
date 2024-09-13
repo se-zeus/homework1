@@ -120,34 +120,34 @@ jobs:
       run: cat logs/pylint_log.txt
 
     # Update README with badges
-    - name: Update README with badges
-      run: |
-        RUN_LOG_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-        PYLINT_BADGE_URL="https://img.shields.io/badge/Pylint-${{ env.PYLINT_BADGE_COLOR }}.svg"
-        PYTEST_BADGE_URL="https://img.shields.io/badge/Pytest-${{ env.PYTEST_BADGE_COLOR }}.svg"
-        AUTOPEP8_BADGE_URL="https://img.shields.io/badge/AutoPEP8-${{ env.AUTOPEP8_BADGE_COLOR }}.svg"
-        RADON_BADGE_URL="https://img.shields.io/badge/Radon-${{ env.RADON_BADGE_COLOR }}.svg"
-        BANDIT_BADGE_URL="https://img.shields.io/badge/Bandit-${{ env.BANDIT_BADGE_COLOR }}.svg"
+    # - name: Update README with badges
+    #   run: |
+    #     RUN_LOG_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+    #     PYLINT_BADGE_URL="https://img.shields.io/badge/Pylint-${{ env.PYLINT_BADGE_COLOR }}.svg"
+    #     PYTEST_BADGE_URL="https://img.shields.io/badge/Pytest-${{ env.PYTEST_BADGE_COLOR }}.svg"
+    #     AUTOPEP8_BADGE_URL="https://img.shields.io/badge/AutoPEP8-${{ env.AUTOPEP8_BADGE_COLOR }}.svg"
+    #     RADON_BADGE_URL="https://img.shields.io/badge/Radon-${{ env.RADON_BADGE_COLOR }}.svg"
+    #     BANDIT_BADGE_URL="https://img.shields.io/badge/Bandit-${{ env.BANDIT_BADGE_COLOR }}.svg"
         
-        sed -i '/\[!\[badge_pylint\]/c\[!\[badge_pylint\]('"${PYLINT_BADGE_URL}"')]('"${RUN_LOG_URL}"')' README.md
-        sed -i '/\[!\[badge_pytest\]/c\[!\[badge_pytest\]('"${PYTEST_BADGE_URL}"')]('"${RUN_LOG_URL}"')' README.md
-        sed -i '/\[!\[badge_autopep8\]/c\[!\[badge_autopep8\]('"${AUTOPEP8_BADGE_URL}"')]('"${RUN_LOG_URL}"')' README.md
-        sed -i '/\[!\[badge_radon\]/c\[!\[badge_radon\]('"${RADON_BADGE_URL}"')]('"${RUN_LOG_URL}"')' README.md
-        sed -i '/\[!\[badge_bandit\]/c\[!\[badge_bandit\]('"${BANDIT_BADGE_URL}"')]('"${RUN_LOG_URL}"')' README.md
+    #     sed -i '/\[!\[badge_pylint\]/c\[!\[badge_pylint\]('"${PYLINT_BADGE_URL}"')]('"${RUN_LOG_URL}"')' README.md
+    #     sed -i '/\[!\[badge_pytest\]/c\[!\[badge_pytest\]('"${PYTEST_BADGE_URL}"')]('"${RUN_LOG_URL}"')' README.md
+    #     sed -i '/\[!\[badge_autopep8\]/c\[!\[badge_autopep8\]('"${AUTOPEP8_BADGE_URL}"')]('"${RUN_LOG_URL}"')' README.md
+    #     sed -i '/\[!\[badge_radon\]/c\[!\[badge_radon\]('"${RADON_BADGE_URL}"')]('"${RUN_LOG_URL}"')' README.md
+    #     sed -i '/\[!\[badge_bandit\]/c\[!\[badge_bandit\]('"${BANDIT_BADGE_URL}"')]('"${RUN_LOG_URL}"')' README.md
 
-        git config --global user.name "github-actions[bot]"
-        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+    #     git config --global user.name "github-actions[bot]"
+    #     git config --global user.email "github-actions[bot]@users.noreply.github.com"
         
-        git checkout main
-        git pull
+    #     git checkout main
+    #     git pull
         
-        if git diff --quiet; then
-          echo "No changes to commit"
-        else
-          git add README.md
-          git commit -m "Update README badges"
-          git push
-        fi
+    #     if git diff --quiet; then
+    #       echo "No changes to commit"
+    #     else
+    #       git add README.md
+    #       git commit -m "Update README badges"
+    #       git push
+    #     fi
 
     # Fail the build if any tool failed
     - name: Fail if any tool failed
